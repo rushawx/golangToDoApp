@@ -83,6 +83,7 @@ The API documentation is available via Swagger UI. After running the application
 
 ### Project Structure
 
+```shell
 golangToDo/
 ├── cmd/
 │   └── main.go
@@ -98,3 +99,4 @@ golangToDo/
 │   └── swagger.yaml
 ├── go.mod
 └── go.sum
+```
