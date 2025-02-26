@@ -23,7 +23,7 @@ This is a simple ToDo application written in Go. It provides a RESTful API to ma
 
     ```sh
     git clone git@github.com:rushawx/golangToDoApp.git
-    cd golangToDoApp
+    cd golangToDoApp/toDoApp
     ```
 
 2. Install dependencies:
@@ -49,7 +49,7 @@ This is a simple ToDo application written in Go. It provides a RESTful API to ma
 2. Run the application:
 
     ```sh
-    go run cmd/main.go
+    go run main.go
     ```
 
 3. The application will start on `http://localhost:8080`.
