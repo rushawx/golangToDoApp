@@ -22,7 +22,7 @@ This is a simple ToDo application written in Go. It provides a RESTful API to ma
 1. Clone the repository:
 
     ```sh
-    git clone https://github.com/yourusername/golangToDo.git
+    git clone git@github.com:rushawx/golangToDoApp.git
     cd golangToDo
     ```
 
