@@ -1,0 +1,138 @@
+basePath: /
+definitions:
+  todo.Task:
+    properties:
+      createdAt:
+        type: string
+      description:
+        type: string
+      done:
+        type: boolean
+      id:
+        type: string
+      title:
+        type: string
+      toDo:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  todo.TaskRequest:
+    properties:
+      description:
+        type: string
+      title:
+        type: string
+      toDo:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample ToDo server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: ToDo API
+  version: "1.0"
+paths:
+  /tasks:
+    get:
+      description: Get all tasks
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/todo.Task'
+            type: array
+      summary: Get all tasks
+      tags:
+      - tasks
+    post:
+      consumes:
+      - application/json
+      description: Create a new task with the input payload
+      parameters:
+      - description: Task to create
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/todo.TaskRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/todo.Task'
+      summary: Create a new task
+      tags:
+      - tasks
+  /tasks/{id}:
+    delete:
+      description: Delete a task by ID
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+      summary: Delete a task by ID
+      tags:
+      - tasks
+    get:
+      description: Get a task by ID
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/todo.Task'
+      summary: Get a task by ID
+      tags:
+      - tasks
+    put:
+      consumes:
+      - application/json
+      description: Update a task by ID
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Task to update
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/todo.Task'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/todo.Task'
+      summary: Update a task by ID
+      tags:
+      - tasks
+swagger: "2.0"
