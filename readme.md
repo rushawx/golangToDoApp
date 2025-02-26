@@ -85,8 +85,7 @@ The API documentation is available via Swagger UI. After running the application
 
 ```shell
 golangToDo/
-├── cmd/
-│   └── main.go
+├── main.go
 ├── internal/
 │   └── todo/
 │       ├── handler.go
