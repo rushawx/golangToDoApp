@@ -1,29 +1,56 @@
 basePath: /
 definitions:
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
   todo.Task:
     properties:
       createdAt:
         type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
       description:
         type: string
       done:
         type: boolean
       id:
+        type: integer
+      task_id:
         type: string
       title:
         type: string
-      toDo:
+      todo:
         type: string
       updatedAt:
         type: string
     type: object
-  todo.TaskRequest:
+  todo.TaskCreateRequest:
     properties:
       description:
         type: string
       title:
         type: string
-      toDo:
+      todo:
+        type: string
+    required:
+    - description
+    - title
+    - todo
+    type: object
+  todo.TaskUpdateRequest:
+    properties:
+      description:
+        type: string
+      done:
+        type: boolean
+      title:
+        type: string
+      todo:
         type: string
     type: object
 host: localhost:8080
@@ -65,7 +92,7 @@ paths:
         name: task
         required: true
         schema:
-          $ref: '#/definitions/todo.TaskRequest'
+          $ref: '#/definitions/todo.TaskCreateRequest'
       produces:
       - application/json
       responses:
@@ -124,7 +151,7 @@ paths:
         name: task
         required: true
         schema:
-          $ref: '#/definitions/todo.Task'
+          $ref: '#/definitions/todo.TaskUpdateRequest'
       produces:
       - application/json
       responses:

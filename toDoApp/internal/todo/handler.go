@@ -66,7 +66,7 @@ func (th *TaskHandler) GetTask() http.HandlerFunc {
 // @Tags			tasks
 // @Accept			json
 // @Produce		json
-// @Param			task	body		TaskRequest	true	"Task to create"
+// @Param			task	body		TaskCreateRequest	true	"Task to create"
 // @Success		200		{object}	Task
 // @Router			/tasks [post]
 func (th *TaskHandler) CreateTask() http.HandlerFunc {
@@ -93,7 +93,7 @@ func (th *TaskHandler) CreateTask() http.HandlerFunc {
 // @Accept			json
 // @Produce		json
 // @Param			id		path		string	true	"Task ID"
-// @Param			task	body		Task	true	"Task to update"
+// @Param			task	body		TaskUpdateRequest	true	"Task to update"
 // @Success		200		{object}	Task
 // @Router			/tasks/{id} [put]
 func (th *TaskHandler) UpdateTask() http.HandlerFunc {
@@ -127,17 +127,18 @@ func (th *TaskHandler) UpdateTask() http.HandlerFunc {
 		} else {
 			todo = body.ToDo
 		}
-		id, err := uuid.FromBytes([]byte(idString))
+		id, err := uuid.Parse(idString)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		data, err := th.TaskRepository.UpdateTask(&Task{
 			Model:       gorm.Model{ID: uint(task.ID)},
-			TaskID:      id[:],
+			TaskID:      id,
 			Title:       title,
 			Description: description,
 			ToDo:        todo,
+			Done:        body.Done,
 		})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -65,7 +65,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/todo.TaskRequest"
+                            "$ref": "#/definitions/todo.TaskCreateRequest"
                         }
                     }
                 ],
@@ -133,7 +133,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/todo.Task"
+                            "$ref": "#/definitions/todo.TaskUpdateRequest"
                         }
                     }
                 ],
@@ -170,11 +170,26 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "gorm.DeletedAt": {
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string"
+                },
+                "valid": {
+                    "description": "Valid is true if Time is not NULL",
+                    "type": "boolean"
+                }
+            }
+        },
         "todo.Task": {
             "type": "object",
             "properties": {
                 "createdAt": {
                     "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "description": {
                     "type": "string"
@@ -183,12 +198,15 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "id": {
+                    "type": "integer"
+                },
+                "task_id": {
                     "type": "string"
                 },
                 "title": {
                     "type": "string"
                 },
-                "toDo": {
+                "todo": {
                     "type": "string"
                 },
                 "updatedAt": {
@@ -196,8 +214,13 @@ const docTemplate = `{
                 }
             }
         },
-        "todo.TaskRequest": {
+        "todo.TaskCreateRequest": {
             "type": "object",
+            "required": [
+                "description",
+                "title",
+                "todo"
+            ],
             "properties": {
                 "description": {
                     "type": "string"
@@ -205,7 +228,24 @@ const docTemplate = `{
                 "title": {
                     "type": "string"
                 },
-                "toDo": {
+                "todo": {
+                    "type": "string"
+                }
+            }
+        },
+        "todo.TaskUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "done": {
+                    "type": "boolean"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "todo": {
                     "type": "string"
                 }
             }
