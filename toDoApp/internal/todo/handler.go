@@ -1,9 +1,13 @@
 package todo
 
 import (
-	"encoding/json"
 	"net/http"
 	"time"
+	"toDo/pkg/request"
+	"toDo/pkg/response"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type TaskHandler struct {
@@ -34,9 +38,7 @@ func (th *TaskHandler) GetTasks() http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(data)
+		response.Json(w, data, http.StatusOK)
 	}
 }
 
@@ -55,9 +57,7 @@ func (th *TaskHandler) GetTask() http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(data)
+		response.Json(w, data, http.StatusOK)
 	}
 }
 
@@ -71,22 +71,19 @@ func (th *TaskHandler) GetTask() http.HandlerFunc {
 // @Router			/tasks [post]
 func (th *TaskHandler) CreateTask() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var input TaskRequest
-		err := json.NewDecoder(r.Body).Decode(&input)
+
+		body, err := request.HandleBody[TaskCreateRequest](&w, r)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		data := NewTask(input.Title, input.Description, input.ToDo)
+		data := NewTask(body.Title, body.Description, body.ToDo)
 		task, err := th.TaskRepository.CreateTask(data)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(task)
-
+		response.Json(w, task, http.StatusCreated)
 	}
 }
 
@@ -101,38 +98,52 @@ func (th *TaskHandler) CreateTask() http.HandlerFunc {
 // @Router			/tasks/{id} [put]
 func (th *TaskHandler) UpdateTask() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id := r.PathValue("id")
-		var task Task
-		err := json.NewDecoder(r.Body).Decode(&task)
+		idString := r.PathValue("id")
+		body, err := request.HandleBody[TaskUpdateRequest](&w, r)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		taskDb, err := th.TaskRepository.GetTask(id)
+		task, err := th.TaskRepository.GetTask(idString)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		task.ID = id
-		task.CreatedAt = taskDb.CreatedAt
-		task.UpdatedAt = time.Now()
-		if task.Title == "" {
-			task.Title = taskDb.Title
+		var title string
+		if body.Title == "" {
+			title = task.Title
+		} else {
+			title = body.Title
 		}
-		if task.Description == "" {
-			task.Description = taskDb.Description
+		var description string
+		if body.Description == "" {
+			description = task.Description
+		} else {
+			description = body.Description
 		}
-		if task.ToDo.IsZero() {
-			task.ToDo = taskDb.ToDo
+		var todo time.Time
+		if body.ToDo.IsZero() {
+			todo = task.ToDo
+		} else {
+			todo = body.ToDo
 		}
-		data, err := th.TaskRepository.UpdateTask(&task)
+		id, err := uuid.FromBytes([]byte(idString))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(data)
+		data, err := th.TaskRepository.UpdateTask(&Task{
+			Model:       gorm.Model{ID: uint(task.ID)},
+			TaskID:      id[:],
+			Title:       title,
+			Description: description,
+			ToDo:        todo,
+		})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		response.Json(w, data, http.StatusCreated)
 	}
 }
 
@@ -144,8 +155,8 @@ func (th *TaskHandler) UpdateTask() http.HandlerFunc {
 // @Router			/tasks/{id} [delete]
 func (th *TaskHandler) DeleteTask() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id := r.PathValue("id")
-		err := th.TaskRepository.DeleteTask(id)
+		idString := r.PathValue("id")
+		err := th.TaskRepository.DeleteTask(idString)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

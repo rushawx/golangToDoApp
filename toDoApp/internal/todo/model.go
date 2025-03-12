@@ -4,26 +4,27 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type Task struct {
-	ID          string
-	Title       string
-	Description string
-	Done        bool
-	ToDo        time.Time
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	gorm.Model
+	TaskID      []byte    `json:"task_id" gorm:"uniqueIndex"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	Done        bool      `json:"done"`
+	ToDo        time.Time `json:"todo"`
 }
 
 func NewTask(title string, description string, todo time.Time) *Task {
+	u := uuid.New()
+	uBytes := u[:]
+
 	return &Task{
-		ID:          uuid.New().String(),
+		TaskID:      uBytes,
 		Title:       title,
 		Description: description,
 		Done:        false,
 		ToDo:        todo,
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
 	}
 }

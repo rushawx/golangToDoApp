@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY . .
 
+RUN go build -o build/init migrations/init.go
 RUN go build -o build/main main.go
 
 COPY entrypoint.sh /app/entrypoint.sh

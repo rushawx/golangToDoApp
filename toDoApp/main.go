@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"toDo/configs"
 	"toDo/internal/todo"
 	"toDo/pkg/db"
 
@@ -26,7 +27,8 @@ import (
 // @host		localhost:8080
 // @BasePath	/
 func main() {
-	db := db.NewDb()
+	conf := configs.DefaultConfig()
+	db := db.NewDb(conf)
 
 	router := http.NewServeMux()
 

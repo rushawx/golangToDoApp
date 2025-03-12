@@ -1,8 +1,9 @@
 package todo
 
 import (
-	"errors"
 	"toDo/pkg/db"
+
+	"gorm.io/gorm/clause"
 )
 
 type TaskRepository struct {
@@ -16,73 +17,45 @@ func NewTaskRepository(db *db.Db) *TaskRepository {
 }
 
 func (tr *TaskRepository) CreateTask(task *Task) (*Task, error) {
-	tr.Database.Tasks[task.ID] = db.TaskDb{
-		ID:          task.ID,
-		Title:       task.Title,
-		Description: task.Description,
-		Done:        task.Done,
-		ToDo:        task.ToDo,
-		CreatedAt:   task.CreatedAt,
-		UpdatedAt:   task.UpdatedAt,
+	result := tr.Database.Create(task)
+	if result.Error != nil {
+		return nil, result.Error
 	}
 	return task, nil
 }
 
 func (tr *TaskRepository) GetTask(id string) (*Task, error) {
-	task, ok := tr.Database.Tasks[id]
-	if !ok {
-		return nil, errors.New("Task not found")
+	data := Task{}
+	idBytes := []byte(id)
+	result := tr.Database.First(&data, "task_id = ?", idBytes)
+	if result.Error != nil {
+		return nil, result.Error
 	}
-	data := &Task{
-		ID:          task.ID,
-		Title:       task.Title,
-		Description: task.Description,
-		Done:        task.Done,
-		ToDo:        task.ToDo,
-		CreatedAt:   task.CreatedAt,
-		UpdatedAt:   task.UpdatedAt,
-	}
-	return data, nil
+	return &data, nil
 }
 
 func (tr *TaskRepository) GetTasks() ([]*Task, error) {
 	var tasks []*Task
-	for _, task := range tr.Database.Tasks {
-		tasks = append(tasks, &Task{
-			ID:          task.ID,
-			Title:       task.Title,
-			Description: task.Description,
-			Done:        task.Done,
-			ToDo:        task.ToDo,
-			CreatedAt:   task.CreatedAt,
-			UpdatedAt:   task.UpdatedAt,
-		})
+	result := tr.Database.Find(&tasks)
+	if result.Error != nil {
+		return nil, result.Error
 	}
 	return tasks, nil
 }
 
 func (tr *TaskRepository) UpdateTask(task *Task) (*Task, error) {
-	_, ok := tr.Database.Tasks[task.ID]
-	if !ok {
-		return nil, errors.New("Task not found")
-	}
-	tr.Database.Tasks[task.ID] = db.TaskDb{
-		ID:          task.ID,
-		Title:       task.Title,
-		Description: task.Description,
-		Done:        task.Done,
-		ToDo:        task.ToDo,
-		CreatedAt:   task.CreatedAt,
-		UpdatedAt:   task.UpdatedAt,
+	result := tr.Database.Clauses(clause.Returning{}).Where("task_id = ?", task.TaskID).Updates(task)
+	if result.Error != nil {
+		return nil, result.Error
 	}
 	return task, nil
 }
 
 func (tr *TaskRepository) DeleteTask(id string) error {
-	_, ok := tr.Database.Tasks[id]
-	if !ok {
-		return errors.New("Task not found")
+	task, err := tr.GetTask(id)
+	if err != nil {
+		return err
 	}
-	delete(tr.Database.Tasks, id)
-	return nil
+	result := tr.Database.Delete(task)
+	return result.Error
 }

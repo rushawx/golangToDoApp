@@ -1,24 +1,21 @@
 package db
 
-import "time"
+import (
+	"log"
+	"toDo/configs"
 
-type TaskDb struct {
-	ID          string
-	Title       string
-	Description string
-	Done        bool
-	ToDo        time.Time
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	DeletedAt   time.Time
-}
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+)
 
 type Db struct {
-	Tasks map[string]TaskDb
+	*gorm.DB
 }
 
-func NewDb() *Db {
-	return &Db{
-		Tasks: make(map[string]TaskDb),
+func NewDb(config *configs.Config) *Db {
+	db, err := gorm.Open(postgres.Open(config.Db.Dsn), &gorm.Config{})
+	if err != nil {
+		log.Fatalf("failed to connect to db")
 	}
+	return &Db{db}
 }
