@@ -9,11 +9,16 @@ import (
 )
 
 type Config struct {
-	Db DbConfig
+	Db   DbConfig
+	Auth AuthConfig
 }
 
 type DbConfig struct {
 	Dsn string
+}
+
+type AuthConfig struct {
+	Secret string
 }
 
 func DefaultConfig() *Config {
@@ -31,6 +36,9 @@ func DefaultConfig() *Config {
 				os.Getenv("PG_DATABASE"),
 				os.Getenv("PG_PORT"),
 			),
+		},
+		Auth: AuthConfig{
+			Secret: os.Getenv("TOKEN"),
 		},
 	}
 }

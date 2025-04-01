@@ -1,5 +1,44 @@
 basePath: /
 definitions:
+  auth.LoginRequest:
+    properties:
+      code:
+        type: string
+      session_id:
+        type: string
+    required:
+    - code
+    - session_id
+    type: object
+  auth.LoginResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  auth.RegisterRequest:
+    properties:
+      phone:
+        type: string
+    required:
+    - phone
+    type: object
+  auth.RegisterResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  auth.SessionRequest:
+    properties:
+      phone:
+        type: string
+    required:
+    - phone
+    type: object
+  auth.SessionResponse:
+    properties:
+      session_id:
+        type: string
+    type: object
   gorm.DeletedAt:
     properties:
       time:
@@ -67,6 +106,101 @@ info:
   title: ToDo API
   version: "1.0"
 paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user using session ID and code, and returns a JWT
+        token
+      parameters:
+      - description: Login Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Login a user
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Registers a user using their phone number
+      parameters:
+      - description: Register Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/auth.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.RegisterResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      summary: Register a user
+      tags:
+      - Auth
+  /auth/session:
+    post:
+      consumes:
+      - application/json
+      description: Generates a session ID for the given phone number
+      parameters:
+      - description: Session Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/auth.SessionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.SessionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      summary: Create a session
+      tags:
+      - Auth
   /tasks:
     get:
       description: Get all tasks
@@ -96,10 +230,18 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             $ref: '#/definitions/todo.Task'
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
       summary: Create a new task
       tags:
       - tasks
@@ -115,6 +257,14 @@ paths:
       responses:
         "204":
           description: No Content
+        "404":
+          description: Task not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
       summary: Delete a task by ID
       tags:
       - tasks
@@ -133,6 +283,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/todo.Task'
+        "404":
+          description: Task not found
+          schema:
+            type: string
       summary: Get a task by ID
       tags:
       - tasks
@@ -159,6 +313,18 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/todo.Task'
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "404":
+          description: Task not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
       summary: Update a task by ID
       tags:
       - tasks

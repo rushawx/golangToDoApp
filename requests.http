@@ -1,0 +1,24 @@
+curl -X GET http://localhost:8080/tasks
+
+curl -X GET http://localhost:8080/tasks/{id}
+
+curl -X POST http://localhost:8080/tasks \
+-H "Authorization: Bearer <your_token>" \
+-H "Content-Type: application/json" \
+-d '{
+  "title": "New Task",
+  "description": "This is a new task",
+  "toDo": "2025-04-10T10:00:00Z"
+}'
+
+curl -X PUT http://localhost:8080/tasks/{id} \
+-H "Authorization: Bearer <your_token>" \
+-H "Content-Type: application/json" \
+-d '{
+  "title": "Updated Task Title",
+  "description": "Updated description",
+  "toDo": "2025-04-15T10:00:00Z",
+  "done": true
+}'
+
+curl -X DELETE http://localhost:8080/tasks/{id} -H "Authorization: Bearer <your_token>"

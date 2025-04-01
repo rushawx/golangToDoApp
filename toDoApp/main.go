@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"net/http"
 	"toDo/configs"
+	"toDo/internal/auth"
 	"toDo/internal/todo"
+	"toDo/internal/user"
 	"toDo/pkg/db"
 
 	_ "toDo/docs"
@@ -33,8 +35,13 @@ func main() {
 	router := http.NewServeMux()
 
 	taskRepository := todo.NewTaskRepository(db)
+	userRepository := user.NewUserRepository(db)
+	sessionRepository := user.NewSessionRepository(db)
 
-	todo.NewTaskHandler(router, taskRepository)
+	authService := auth.NewAuthService(userRepository, sessionRepository)
+
+	auth.NewAuthHandler(router, auth.AuthHandlerDeps{Config: conf, AuthService: authService})
+	todo.NewTaskHandler(router, todo.TaskHandlerDeps{TaskRepository: taskRepository, Config: conf})
 
 	router.Handle("/swagger/", httpSwagger.WrapHandler)
 

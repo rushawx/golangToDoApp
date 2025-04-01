@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"toDo/internal/todo"
+	"toDo/internal/user"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
@@ -32,7 +33,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = db.AutoMigrate(&todo.Task{})
+	err = db.AutoMigrate(&todo.Task{}, &user.User{}, &user.Session{})
 	if err != nil {
 		log.Fatal(err)
 	}
