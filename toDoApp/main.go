@@ -28,7 +28,7 @@ import (
 
 // @host		localhost:8080
 // @BasePath	/
-func main() {
+func App() http.Handler {
 	conf := configs.DefaultConfig()
 	db := db.NewDb(conf)
 
@@ -44,6 +44,12 @@ func main() {
 	todo.NewTaskHandler(router, todo.TaskHandlerDeps{TaskRepository: taskRepository, Config: conf})
 
 	router.Handle("/swagger/", httpSwagger.WrapHandler)
+
+	return router
+}
+
+func main() {
+	router := App()
 
 	server := http.Server{
 		Addr:    ":8080",

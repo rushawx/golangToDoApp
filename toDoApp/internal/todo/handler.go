@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"time"
 	"toDo/configs"
-	"toDo/pkg/middleware"
 	"toDo/pkg/request"
 	"toDo/pkg/response"
 
@@ -28,9 +27,9 @@ func NewTaskHandler(router *http.ServeMux, deps TaskHandlerDeps) {
 	}
 	router.HandleFunc("GET /tasks", th.GetTasks())
 	router.HandleFunc("GET /tasks/{id}", th.GetTask())
-	router.Handle("POST /tasks", middleware.IsAuthed(th.CreateTask(), deps.Config))
-	router.Handle("PUT /tasks/{id}", middleware.IsAuthed(th.UpdateTask(), deps.Config))
-	router.Handle("DELETE /tasks/{id}", middleware.IsAuthed(th.DeleteTask(), deps.Config))
+	router.HandleFunc("POST /tasks", th.CreateTask())
+	router.HandleFunc("PUT /tasks/{id}", th.UpdateTask())
+	router.HandleFunc("DELETE /tasks/{id}", th.DeleteTask())
 }
 
 // @Summary		Get all tasks
